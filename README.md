@@ -14,7 +14,7 @@
 
 ## 下载
 
-**[⬇ 下载最新版 APK](https://github.com/mtguowang/tool-plugin/raw/main/apk/tool-plugin-v1.0-arm64.apk)**
+**[⬇ 下载最新版 APK](https://github.com/mtguowang/tool-plugin/releases/latest)**
 
 | 项 | 说明 |
 |---|---|
@@ -36,7 +36,7 @@
 
 ## 快速开始
 
-1. 下载上面的 APK 并安装
+1. 从 [Releases](https://github.com/mtguowang/tool-plugin/releases/latest) 下载最新 APK 并安装
 2. 打开 App，点右上角 **云图标**（插件库）
 3. 在「插件库设置」里填入插件仓库地址（你自己的库，或别人分享的库）
 4. 勾选需要的插件，点「导入选中」
