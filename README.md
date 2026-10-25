@@ -45,6 +45,24 @@
 > 不知道填什么插件库地址？插件库是**你自己或别人维护的一个 GitHub 仓库**，
 > 里面是 `index.json` + 若干 `.qbpkg` 文件。App 不内置任何插件。
 
+## 校验插件
+
+写完插件先本地校验，别急着装 App 试：
+
+```bash
+# 下载校验器（两个文件放同一目录）
+curl -O https://raw.githubusercontent.com/mtguowang/tool-plugin/main/schema/validate.py
+curl -O https://raw.githubusercontent.com/mtguowang/tool-plugin/main/schema/manifest.schema.json
+
+# 校验
+python validate.py <你的插件目录>/manifest.json
+```
+
+零依赖，只需 Python 3.8+。
+
+**它检查什么**：字段名拼写、必填字段、类型/枚举/正则、`goto`/`branch`/`poll.steps` 的目标 id 是否存在、`vars`/`inputs`/`secrets` 引用是否有来源、`allowHosts` 格式与 URL 匹配。
+
+**它不检查什么**：加密算法算得对不对、服务端认不认这些参数、`set.js` 能不能跑通 —— 那些只能真机验证。
 ## 自己写插件
 
 插件就是一份 JSON 文件。完整格式说明见：
