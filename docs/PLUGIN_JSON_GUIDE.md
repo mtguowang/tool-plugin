@@ -90,8 +90,31 @@
 
 写完 manifest 后，在仓库根目录运行（Python 3.9+）：
 
+**先获取校验器**（两个文件，从本仓库下载）：
+
 ```bash
-python schema/validate.py plugins/<你的插件目录>/manifest.json
+# 方式一：直接下载（推荐）
+curl -O https://raw.githubusercontent.com/mtguowang/tool-plugin/main/schema/validate.py
+curl -O https://raw.githubusercontent.com/mtguowang/tool-plugin/main/schema/manifest.schema.json
+
+# 方式二：git clone 整个仓库
+git clone https://github.com/mtguowang/tool-plugin.git
+# 校验器在 tool-plugin/schema/ 下
+```
+
+> ⚠️ `validate.py` 与 `manifest.schema.json` **必须放在同一目录**（前者默认读同目录的 schema）。
+> 零依赖，只需 Python 3.8+，不需要 `pip install` 任何东西。
+
+**运行校验**：
+
+```bash
+python validate.py <你的插件目录>/manifest.json
+
+# 也可以一次校验整个目录（批量）
+python validate.py --dir <插件根目录>
+
+# 只看错误不看统计
+python validate.py manifest.json --quiet
 ```
 
 它会做三类检查：
