@@ -1166,6 +1166,10 @@
               "minLength": 1,
               "description": "可选。type=webview/select 时不适用。"
             },
+            "obscure": {
+              "type": "boolean",
+              "description": "可选（v1.8 新增）。界面是否掩码（密文显示）。省略时由宿主按 input 键名自动判定（密码类掩码、验证码与手机号/邮箱不掩码）。显式写 true 强制掩码、false 强制明文。仅影响界面显示，不影响日志脱敏 —— 日志始终按 sensitive 脱敏。"
+            },
             "image": {
               "$ref": "#/$defs/template",
               "description": "type=image 时必需。base64 图片。type=webview/select 时不适用。"
