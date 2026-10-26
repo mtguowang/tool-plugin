@@ -1300,7 +1300,76 @@ python -m jsonschema -i plugins/<id>/manifest.json schema/manifest.schema.json
 | 7 | 多一个字段 `foo` | ❌ `E_SCHEMA` | 未知字段一律拒绝 |
 | 8 | 完整结构 | ✅ 通过 | — |
 
-### 13.5 手写 JSON 的五个高频坑
+### 13.5 发布到插件库（`index.json`）
+
+想让别人能一键拉取你的插件，需要一个**插件库仓库**——任意一个公开 GitHub 仓库，
+根目录放 `index.json` + 若干 `.qbpkg` 文件：
+
+```
+your-plugin-repo/
+├── index.json                 ← 清单（必填）
+└── dist/
+    ├── demo.hello.qbpkg
+    └── demo.hash.qbpkg
+```
+
+`index.json` 的结构：
+
+```json
+{
+  "schemaVersion": 1,
+  "name": "我的插件库",
+  "updatedAt": "2026-01-02T03:04:05Z",
+  "plugins": [
+    {
+      "id": "demo.hello",
+      "name": "示例：打个招呼",
+      "version": "1.0.0",
+      "allowHosts": ["demo.invalid"],
+      "path": "dist/demo.hello.qbpkg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "description": "一句话说明这个插件干什么",
+      "author": "你的名字"
+    }
+  ]
+}
+```
+
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `schemaVersion` | ✅ | 固定 `1` |
+| `name` | ✅ | 插件库显示名（App 里会显示） |
+| `updatedAt` | ✅ | ISO 8601 UTC 时间戳 |
+| `plugins` | ✅ | 插件条目数组 |
+| `plugins[].id` | ✅ | 必须与插件 manifest 里的 `id` **完全一致** |
+| `plugins[].name` | ✅ | 显示名（可与 manifest 不同，这里更简短） |
+| `plugins[].version` | ✅ | 语义化版本，必须与 manifest 的 `version` 一致 |
+| `plugins[].allowHosts` | ✅ | 与 manifest 的 `allowHosts` 一致（App 会对比，不一致会警告） |
+| `plugins[].path` | ✅ | `.qbpkg` 文件相对仓库根的路径 |
+| `plugins[].sha256` | ✅ | **`.qbpkg` 文件的 SHA-256（小写 hex）** —— App 下载后强制校验，不匹配就拒绝 |
+| `plugins[].description` | 可选 | 一句话说明 |
+| `plugins[].author` | 可选 | 作者 |
+
+**生成 `sha256`**：
+
+```bash
+# Linux / macOS
+sha256sum dist/demo.hello.qbpkg
+
+# Windows PowerShell
+(Get-FileHash dist\demo.hello.qbpkg -Algorithm SHA256).Hash.ToLower()
+```
+
+**用户怎么用**：App → 插件库 → 设置里填仓库地址（`https://github.com/你/仓库` 即可，
+App 会自动转成 raw 地址；也可直接填 `.../main/index.json`）→ 刷新 → 勾选 → 导入。
+
+**更新插件**：改 manifest → 重新导出 `.qbpkg` → 上传覆盖 → **更新 `index.json` 里的
+`version` 和 `sha256`**（漏改 sha256 会导致所有用户下载失败，这是最常见的翻车点）。
+
+**国内加速**：App 内置多级镜像（直连 → ghfast.top → gh-proxy.com → jsDelivr），
+无需你额外配置。
+
+### 13.6 手写 JSON 的五个高频坑
 
 1. **正则里的反斜杠要双写**：`pattern: "^\\d{6}$"`（JSON 字符串层先吃一层）。
 2. **UTF-8 无 BOM**：Windows 编辑器默认可能加 BOM，导入器会拒绝。
@@ -1318,7 +1387,7 @@ python -m jsonschema -i plugins/<id>/manifest.json schema/manifest.schema.json
 
 ```jsonc
 {
-  "id": "demo.password-login", "name": "密码登录示例", "version": "1.0.0",
+  "id": "demo.passwordlogin", "name": "密码登录示例", "version": "1.0.0",
   "engine": ">=1.0 <2.0",
   "allowHosts": ["api.example.com"],
   "inputs": [
@@ -1533,7 +1602,12 @@ python -m jsonschema -i plugins/<id>/manifest.json schema/manifest.schema.json
 - [ ] 模板中可能为 null 的引用都有兜底（`optional`+`default` / `fn.default`）；
 - [ ] 长轮询的 `maxAttempts × 步数` 不会撞 `flow.length × 3` 上限；
 - [ ] 手机号等示例值已替换为脱敏示例（如 `13800138000`），不含真实账号；
-- [ ] 在测试环境（`allowInsecureLocalhost` 仅限本地）完整跑通主路径 + 失败路径。
+- [ ] **界面掩码符合预期**：手机号/验证码应让用户看到明文（省略 `obscure` 或写 `false`），
+      真正的密码保持掩码；注意 `obscure` 只影响界面，日志仍按 `sensitive` 脱敏；
+- [ ] 在测试环境（`allowInsecureLocalhost` 仅限本地）完整跑通主路径 + 失败路径；
+- [ ] **若发布到插件库**：`index.json` 里的 `sha256` 与实际 `.qbpkg` 文件一致
+      （改过插件必须重算，漏改会让所有用户下载失败——最常见的翻车点）；
+- [ ] **若发布到插件库**：`index.json` 的 `id`/`version`/`allowHosts` 与 manifest 一致。
 
 ---
 
