@@ -19,7 +19,7 @@
 | 项 | 说明 |
 |---|---|
 | 版本 | v1.0 |
-| 大小 | 22 MB |
+| 大小 | 22.5 MB |
 | 架构 | **arm64-v8a**（2017 年后的手机基本都支持）|
 | 系统要求 | Android 7.0（API 24）及以上 |
 | 权限 | 仅网络（无存储、无定位、无通讯录）|
@@ -111,13 +111,16 @@ python validate.py <你的插件目录>/manifest.json
 
 ```
 tool-plugin/
-├── README.md                    ← 本文件
-├── LICENSE                      ← MIT
-├── apk/
-│   └── tool-plugin-v1.0-arm64.apk
-└── docs/
-    └── PLUGIN_JSON_GUIDE.md     ← 插件开发完整文档
+├── README.md                        ← 本文件
+├── LICENSE                          ← MIT
+├── docs/
+│   └── PLUGIN_JSON_GUIDE.md         ← 插件开发完整文档
+└── schema/
+    ├── manifest.schema.json         ← manifest 结构契约
+    └── validate.py                  ← 零依赖离线校验器
 ```
+
+**APK 不放在仓库里**，从 [Releases](https://github.com/mtguowang/tool-plugin/releases/latest) 下载（避免仓库体积膨胀）。
 
 App 源码暂未开源。
 
