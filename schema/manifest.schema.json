@@ -19,7 +19,7 @@
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(\\.[a-z0-9]+)+$",
-      "description": "插件唯一标识，至少两段小写点分（如 zto.member）。批量导入时跨文件查重。"
+      "description": "插件唯一标识，至少两段小写点分（如 demo.hello）。批量导入时跨文件查重。"
     },
     "name": {
       "type": "string",
