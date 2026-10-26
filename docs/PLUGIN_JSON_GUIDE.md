@@ -745,6 +745,10 @@ string    := "'" (any except "'") * "'"     // 单引号字符串，无转义，
     "input": "smsCode",        // ★ 写入 input 命名空间的键（覆盖同名 input）
     "hint": "6 位数字",          // 可选。辅助文案（支持模板）
     "message": "…",            // 可选。confirm 的正文（支持模板）
+    "obscure": false,          // 可选（v1.8）。界面是否掩码：省略走宿主自动判定
+                               // （密码类掩码、验证码与手机号/邮箱明文）；
+                               // true 强制掩码、false 强制明文。
+                               // ★ 只影响界面显示，不影响日志脱敏
     "……": "type 专属字段"
   }
 }
@@ -761,7 +765,17 @@ string    := "'" (any except "'") * "'"     // 单引号字符串，无转义，
 | `select` | `options`（★ 非空数组，`{value, label}` 静态字面量） | 所选项的 `options[].value` |
 
 **支持模板的 ui 字段**：`label`、`hint`、`message`、`image`、`url`、`html`、`baseUrl`。
-**不支持模板**（静态字面量）：`type`、`input`、`pattern`、`maxLength`、`refreshStep`、`bridge`、`options[].value`、`options[].label`。
+**不支持模板**（静态字面量）：`type`、`input`、`pattern`、`maxLength`、`obscure`、`refreshStep`、`bridge`、`options[].value`、`options[].label`。
+
+**`obscure` 的语义**（v1.8 新增，五种 `ui.type` 通用）：
+
+| 写法 | 界面显示 | 日志 |
+|---|---|---|
+| 省略（不写） | 宿主按 `input` 键名自动判定：密码类（password/pwd/passwd）掩码；验证码与手机号/邮箱键名明文 | 照常脱敏 |
+| `"obscure": true` | **强制掩码**（即使键名是 mobile/smsCode） | 照常脱敏 |
+| `"obscure": false` | **强制明文**（即使键名是 password —— 插件作者自己的选择） | **照常脱敏** |
+
+典型用法：接口要求输入「服务密码」但键名不带 password 字样、宿主自动判定成了明文 → 写 `"obscure": true` 强制掩码；反之，想让某个敏感键在界面明文可见（用户需要核对）→ 写 `"obscure": false`。⚠️ 无论怎么写，**日志脱敏始终按 `sensitive` 语义走**，`obscure: false` 不会把值带进日志。
 
 字段互斥（违反 → `E_SCHEMA`）：
 
